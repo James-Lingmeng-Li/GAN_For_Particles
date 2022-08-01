@@ -14,8 +14,10 @@ from keras.layers import LeakyReLU
 from keras.layers import Dropout
 import cv2
 from matplotlib import pyplot as plt
+import numpy as np
 import ssl
 import os
+import time
 import PIL
 ssl._create_default_https_context = ssl._create_unverified_context
 ########################################################################
@@ -30,6 +32,7 @@ import numpy as np
 
 path= 'F:\practise\\resize'
 files= os.listdir(path) #得到文件夹下的所有文件名称
+print(files)
 
 img_data=[]
 for file in files:
@@ -44,11 +47,11 @@ imgs = np.array(img_data, dtype=np.uint8)
 
 
 # plot 25 images
-for i in range(25):
-    plt.subplot(5, 5, 1 + i)
-    plt.axis('off')
-    plt.imshow(imgs[i])
-plt.show()
+# for i in range(25):
+#     plt.subplot(5, 5, 1 + i)
+#     plt.axis('off')
+#     plt.imshow(imgs[i+500])
+# plt.show()
 
 
 #############################################################################
@@ -80,7 +83,7 @@ def define_discriminator(in_shape=(32, 32, 3)):
 
 
 test_discr = define_discriminator()
-print(test_discr.summary())
+# print(test_discr.summary())
 
 
 # define the standalone generator model
@@ -112,7 +115,7 @@ def define_generator(latent_dim):  # latent_dim is the dimension of the latent v
 
 
 test_gen = define_generator(100)
-print(test_gen.summary())
+# print(test_gen.summary())
 
 
 # define the combined generator and discriminator model, for updating the generator
@@ -236,19 +239,19 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, n_epochs=5, n_batch=
 
 ##################################################################
 # Train the GAN
-
-# size of the latent space
-latent_dim = 100
-# create the discriminator
-discriminator = define_discriminator()
-# create the generator
-generator = define_generator(latent_dim)
-# create the gan
-gan_model = define_gan(generator, discriminator)
-# load image data
-dataset = load_real_samples()
-# train model
-train(generator, discriminator, gan_model, dataset, latent_dim, n_epochs=100)
+#
+# # size of the latent space
+# latent_dim = 100
+# # create the discriminator
+# discriminator = define_discriminator()
+# # create the generator
+# generator = define_generator(latent_dim)
+# # create the gan
+# gan_model = define_gan(generator, discriminator)
+# # load image data
+# dataset = load_real_samples()
+# # train model
+# train(generator, discriminator, gan_model, dataset, latent_dim, n_epochs=100)
 
 # ################################################################################
 
@@ -259,29 +262,31 @@ from numpy.random import randn
 
 
 # Plot generated images
-def show_plot(examples, n):
+def show_plot(examples, n,j):
     for i in range(n * n):
         plt.subplot(n, n, 1 + i)
         plt.axis('off')
         plt.imshow(examples[i, :, :, :])
-    plt.show()
+    plt.savefig(f"F:\\practise\\ven\\generated_particle\\{j}.jpg",bbox_inches='tight', pad_inches=0.0)
 
+    # plt.show()
 
 # load model
 model = load_model('cifar_generator_1000epochs.h5')  # Model trained for 100 epochs
 # generate images
-latent_points = generate_latent_points(100, 25)  # Latent dim and n_samples
+t=1
+for i in range(8666,10000):
+    time.sleep(t)
+    latent_points = generate_latent_points(100, 25)  # Latent dim and n_samples
 # generate images
-X = model.predict(latent_points)
+    X = model.predict(latent_points)
 # scale from [-1,1] to [0,1]
-X = (X + 1) / 2.0
-
-import numpy as np
-
-X = (X * 255).astype(np.uint8)
+    X = (X + 1) / 2.0
+    X = (X * 255).astype(np.uint8)
+    print(i)
 
 # plot the result
-show_plot(X, 5)
-
+#     plt.plot(X)
+    show_plot(X, 1,i)
 # Note: CIFAR10 classes are: airplane, automobile, bird, cat, deer, dog, frog, horse,
 # ship, truck
